@@ -1,0 +1,7 @@
+{
+  "name": "ripple-account-listener",
+  "version": "0.0.1",
+  "dependencies": {
+    "ws": "~0.4.3"
+  }
+}
