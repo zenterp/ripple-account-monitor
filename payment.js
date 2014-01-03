@@ -27,7 +27,7 @@ function Payment(msg) {
   if (!!message.transaction.SendMax) {
     this.fromAmount = message.transaction.SendMax.value;
     this.fromCurrency = message.transaction.SendMax.currency;
-    this.toIssuer = message.transaction.SendMax.issuer;
+    this.fromIssuer = message.transaction.SendMax.issuer;
   } else {
     this.fromAmount = parseXrpAmount(message.transaction.Amount);
     this.fromCurrency = 'XRP';
@@ -55,6 +55,8 @@ Payment.prototype.toJSON = function() {
     txState: this.txState,
     txHash: this.txHash,
     toCurrency: this.toCurrency,  
+    toIssuer: this.toIssuer,
+    fromIssuer: this.fromIssuer,
     fromCurrency: this.fromCurrency,
     toAmount: this.toAmount,
     fromAmount: this.fromAmount,
