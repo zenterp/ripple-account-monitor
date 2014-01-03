@@ -1,5 +1,5 @@
 var fixtures = require('./fixtures'),
-		Payment = require('../payment'),
+		Payment = require('../lib/payment'),
 		assert = require('assert')
 		
 var transactions = {
@@ -52,11 +52,11 @@ describe('Payment', function() {
     assert.equal(payment.txHash, '10F868E02B370769F6D9FA4C5D56960D72FF98A6D86A7F56785065E100F3E5BA');
   });
 
-  it('should format an IOU to different IOU payment', function(){
+  it.skip('should format an IOU to different IOU payment', function(){
     throw new Error();
   });
 
-  it('should format an XRP to IOU payment', function(){
+  it.skip('should format an XRP to IOU payment', function(){
     throw new Error();
   });
 });
