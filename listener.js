@@ -22,7 +22,7 @@ function onMessage(data, flags) {
 }
 
 function onClose() {
-  console.log('connection closed')
+  console.log('connection closed');
   delete this;
   connectWebsocket(websocketUrl);
 }
