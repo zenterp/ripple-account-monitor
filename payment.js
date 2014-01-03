@@ -21,7 +21,7 @@ function Payment(msg) {
   } else {
     this.toAmount = message.transaction.Amount.value;
     this.toCurrency = message.transaction.Amount.currency;
-    this.toIssuer = message.transactoin.Amount.issuer;
+    this.toIssuer = message.transaction.Amount.issuer;
   }
 
   if (!!message.transaction.SendMax) {
