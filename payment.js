@@ -21,11 +21,13 @@ function Payment(msg) {
   } else {
     this.toAmount = message.transaction.Amount.value;
     this.toCurrency = message.transaction.Amount.currency;
+    this.toIssuer = message.transactoin.Amount.issuer;
   }
 
   if (!!message.transaction.SendMax) {
     this.fromAmount = message.transaction.SendMax.value;
     this.fromCurrency = message.transaction.SendMax.currency;
+    this.toIssuer = message.transaction.SendMax.issuer;
   } else {
     this.fromAmount = parseXrpAmount(message.transaction.Amount);
     this.fromCurrency = 'XRP';
