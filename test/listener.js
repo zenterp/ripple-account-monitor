@@ -34,9 +34,6 @@ describe('AccountListener', function(){
   })
 
   it('should notify of an incoming payment with an event', function(done){
-    callback = sinon.spy()
-    payment = new Payment(Fixtures.IouToSameIou)
-
     listener.on('payment', function(payment){
       assert.equal(payment.fromAddress, 'rHKueQebtVU9cEamhBbMV8AEViqKjXcBcB')
       assert.equal(payment.toCurrency, 'XAG')
