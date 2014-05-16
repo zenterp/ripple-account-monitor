@@ -1,15 +1,16 @@
 {
-  "name": "ripple-rest-listener",
-  "version": "0.1.0",
-  "description": "an account monitor for ripple",
-  "main": "index.js",
+  "name": "ripple-account-monitor",
+  "version": "1.0.0",
+  "description": "listen to account activity over zeromq",
+  "main": "puller.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node ./test/puller.js"
   },
-  "author": "",
+  "author": "Steven Zeiler",
   "license": "ISC",
   "dependencies": {
-    "ripple-rest-client": "^1.4.0",
-    "async": "^0.8.0"
+    "request": "^2.34.0",
+    "zmq": "^2.7.0",
+    "nconf": "^0.6.9"
   }
 }
