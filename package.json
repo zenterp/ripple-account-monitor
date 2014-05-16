@@ -1,0 +1,15 @@
+{
+  "name": "ripple-rest-listener",
+  "version": "0.1.0",
+  "description": "an account monitor for ripple",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "ripple-rest-client": "^1.4.0",
+    "async": "^0.8.0"
+  }
+}
