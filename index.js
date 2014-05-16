@@ -90,7 +90,7 @@ function getNotification(hash, fn) {
 
 function handleNewNotification(notification, done){
   if (notification){
-    if ('PULLER_CONNECTED'){
+    if (PULLER_CONNECTED){
       var value = JSON.stringify(notification);
       pusher.send(value);
       config.set('lastTransactionHash', notification.hash); 
