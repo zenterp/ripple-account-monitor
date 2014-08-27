@@ -14,7 +14,10 @@
       onTransaction: function(transaction, next) {
         console.log('new transaction', transaction);
         next();
-      }   
+      },
+      onError: function(error) {
+        console.log('RippleAccountMonitor::Error', error);
+      }
     });
 
     monitor.start();

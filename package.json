@@ -1,17 +1,14 @@
 {
   "name": "ripple-account-monitor",
-  "version": "0.1.0",
-  "description": "listen to account activity over zeromq",
-  "main": "puller.js",
+  "version": "1.0.0",
+  "description": "process ripple account activity serially",
+  "main": "src/ripple_account_monitor.js",
   "scripts": {
-    "test": "mocha -R spec test/monitor.js"
+    "test": "mocha -R spec test/monitor_forever.js"
   },
   "author": "Steven Zeiler",
   "license": "ISC",
   "dependencies": {
-    "request": "^2.34.0",
-    "zmq": "^2.7.0",
-    "nconf": "^0.6.9",
     "ripple-rest-client": "^1.10.1"
   }
 }
