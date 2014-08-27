@@ -17,6 +17,8 @@
       }   
     });
 
+    monitor.start();
+
 
 The above will listen forever to the ripple account and call the function `onTransaction` whenever there is a new transaction to process.
 
