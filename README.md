@@ -8,7 +8,7 @@
 
     const RippleAccountMonitor = require('ripple-account-monitor');
 
-    monitor = new RippleAccountMonitor({
+    const monitor = new RippleAccountMonitor({
       rippleRestUrl: 'http://127.0.0.1:5990',
       account: 'r4EwBWxrx5HxYRyisfGzMto3AT8FZiYdWk',
       onTransaction: function(transaction, next) {
