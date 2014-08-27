@@ -1,6 +1,6 @@
 {
   "name": "ripple-account-monitor",
-  "version": "1.0.1",
+  "version": "0.1.0",
   "description": "listen to account activity over zeromq",
   "main": "puller.js",
   "scripts": {
