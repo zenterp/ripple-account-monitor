@@ -22,6 +22,10 @@ function RippleAccountMonitor(options) {
   this.lastHash = options.lastHash;
   this.timeout = options.timeout || 5000;
   this.onTransaction = options.onTransaction;
+  this.onPayment = options.onPayment;
+  this.onTrustSet = options.onTrustSet;
+  this.onAccountSet = options.onAccountSet;
+  this.onOfferCreate = options.onOfferCreate;
   this.onError = options.onError || function(error) {
     console.log('RippleAccountMonitor::Error', error);
   };
@@ -71,12 +75,15 @@ RippleAccountMonitor.prototype = {
         }
         if (notification.next_notification_hash) {
           return _this.rippleRestClient.getTransaction(notification.next_notification_hash, function(error, response) {
-            var transaction = response.transaction;
             if (error) {
               _this.onError(error);
               return callback(error);
             }
-            callback(null, transaction);
+            if (!response) {
+              callback();
+            } else {
+              callback(null, response.transaction);
+            }
           });
         } else {
           return callback();
@@ -95,7 +102,23 @@ RippleAccountMonitor.prototype = {
       if (!transaction) {
         return _this._loop(_this.timeout);
       }
-      _this.onTransaction(transaction, function() {
+      var hook = _this.onTransaction; 
+      switch(transaction.TransactionType) {
+        case 'Payment':
+          if (typeof _this.onPayment === 'function') { hook = _this.onPayment }
+          break;
+        case 'TrustSet':
+          if (typeof _this.onTrustSet === 'function') { hook = _this.onTrustSet }
+          break;
+        case 'AccountSet':
+          if (typeof _this.onAccountSet === 'function') { hook = _this.onAccountSet }
+          break;
+        case 'OfferCreate':
+          if (typeof _this.onOfferCreate === 'function') { hook = _this.onOfferCreate }
+          break;
+        default:
+      }
+      hook(transaction, function() {
         _this.lastHash = transaction.hash;
         _this._loop();
       });
