@@ -26,6 +26,8 @@ function RippleAccountMonitor(options) {
   this.onTrustSet = options.onTrustSet;
   this.onAccountSet = options.onAccountSet;
   this.onOfferCreate = options.onOfferCreate;
+  this.onOfferCancel = options.onOfferCancel;
+  this.onSetRegularKey = options.onSetRegularKey;
   this.onError = options.onError || function(error) {
     console.log('RippleAccountMonitor::Error', error);
   };
@@ -115,6 +117,12 @@ RippleAccountMonitor.prototype = {
           break;
         case 'OfferCreate':
           if (typeof _this.onOfferCreate === 'function') { hook = _this.onOfferCreate }
+          break;
+        case 'OfferCancel':
+          if (typeof _this.onOfferCancel === 'function') { hook = _this.onOfferCancel }
+          break;
+        case 'SetRegularKey':
+          if (typeof _this.onSetRegularKey === 'function') { hook = _this.onSetRegularKey }
           break;
         default:
       }

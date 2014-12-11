@@ -25,6 +25,14 @@ const monitor = new RippleAccountMonitor({
     console.log('new offer created', transaction.hash);
     next();
   },
+  onOfferCancel: function(transaction, next) {
+    console.log('offer cancelled', transaction.hash);
+    next();
+  },
+  onSetRegularKey: function(transaction, next) {
+    console.log('regular key set', transaction.hash);
+    next();
+  },
   onError: function(error) {
     console.log('RippleAccountMonitor::Error', error);
   }
