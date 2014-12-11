@@ -1,6 +1,6 @@
 {
   "name": "ripple-account-monitor",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "process ripple account activity serially",
   "main": "src/ripple_account_monitor.js",
   "scripts": {
@@ -9,6 +9,6 @@
   "author": "Steven Zeiler",
   "license": "ISC",
   "dependencies": {
-    "ripple-rest-client": "^1.10.1"
+    "ripple-rest-client": "^1.13.0"
   }
 }
