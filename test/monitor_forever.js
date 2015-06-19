@@ -1,42 +1,50 @@
-const RippleAccountMonitor = require('../src/ripple_account_monitor.js');
+import RippleAccountMonitor from '../src/ripple_account_monitor'
 
-const monitor = new RippleAccountMonitor({
-  rippleRestUrl: 'https://api.ripple.com/',
-  account: 'r4EwBWxrx5HxYRyisfGzMto3AT8FZiYdWk',
-  lastHash: 'EF5D38031A961C32D4170A1E7A888D57F553D36F40796C94D27C2497F6722E62',
-  timeout: 1000,
-  onTransaction: function(transaction, next) {
-    console.log('new transaction', transaction.TransactionType);
-    next();
-  },
-  onPayment: function(transaction, next) {
-    console.log('new payment', transaction.hash);
-    next();
-  },
-  onTrustSet: function(transaction, next) {
-    console.log('new trust set', transaction.hash);
-    next();
-  },
-  onAccountSet: function(transaction, next) {
-    console.log('new account setting', transaction.hash);
-    next();
-  },
-  onOfferCreate: function(transaction, next) {
-    console.log('new offer created', transaction.hash);
-    next();
-  },
-  onOfferCancel: function(transaction, next) {
-    console.log('offer cancelled', transaction.hash);
-    next();
-  },
-  onSetRegularKey: function(transaction, next) {
-    console.log('regular key set', transaction.hash);
-    next();
-  },
-  onError: function(error) {
-    console.log('RippleAccountMonitor::Error', error);
+class Monitor extends RippleAccountMonitor {
+  onTransaction({TransactionType}, next) {
+    console.log('new transaction', TransactionType)
   }
-});
+
+  onPayment({hash}) {
+    console.log('new payment', hash)
+  }
+
+  onTrustSet({hash}) {
+    console.log('new trust set', hash)
+  }
+  
+  onAccountSet({hash}) {
+    console.log('new account setting', transaction.hash)
+  }
+
+  onOfferCreate(transaction, next) {
+    console.log('new offer created', transaction.hash)
+    next()
+  }
+
+  onOfferCancel(transaction, next) {
+    console.log('offer cancelled', transaction.hash)
+    next()
+  }
+
+  onSetRegularKey(transaction, next) {
+    console.log('regular key set', transaction.hash)
+    next()
+  }
+
+  onError(error) {
+    console.log('RippleAccountMonitor::Error', error,
+                'RippleAccountMonitor::Error', error.message,
+                'RippleAccountMonitor::Error', error.stack)
+  }
+}
+
+const monitor = new Monitor({
+  rippleRestUrl: 'http://127.0.0.1:5990/',
+  account: 'r4EwBWxrx5HxYRyisfGzMto3AT8FZiYdWk',
+  lastHash: '07814E2CAF5677F4D513F1C49849F5974CCD9AFD725F65DEC30FB130CD59A3A9',
+  timeout: 1000
+})
 
 monitor.start();
 

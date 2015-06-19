@@ -1,138 +1,178 @@
-const RippleRestClient = require('ripple-rest-client');
-const ArgumentError = require('./errors/argument_error.js');
+import RippleRestClient from 'ripple-rest-client'
+import ArgumentError from './errors/argument_error'
 
-function RippleAccountMonitor(options) {
-  if (!options) {
-    throw new ArgumentError('options must be an object');
+export default class RippleAccountMonitor {
+
+  constructor(options) {
+    if (!options) {
+      throw new ArgumentError('options must be an object');
+    }
+
+    const {
+      rippleRestUrl,
+      account,
+      lastHash,
+      timeout
+    } = options
+
+    if (!rippleRestUrl) {
+      throw new ArgumentError('options.rippleRestUrl must be a url');
+    }
+
+    if (!account) {
+      throw new ArgumentError('options.account must be a ripple Account');
+    }
+
+    this.rippleRestClient = new RippleRestClient({
+      api: rippleRestUrl,
+      account: account,
+      secret: ''
+    })
+
+    this.lastHash = lastHash
+    this.timeout = timeout || 5000
+    this.stopped = true
   }
-  if (!options.rippleRestUrl) {
-    throw new ArgumentError('options.rippleRestUrl must be a url');
-  }
-  if (!options.account) {
-    throw new ArgumentError('options.account must be a ripple Account');
-  }
-  if (typeof options.onTransaction != 'function') {
-    throw new ArgumentError('options.onTransaction(transaction, next) must be a function');
-  }
-  this.rippleRestClient = new RippleRestClient({
-    api: options.rippleRestUrl,
-    account: options.account,
-    secret: ''
-  });
-  this.lastHash = options.lastHash;
-  this.timeout = options.timeout || 5000;
-  this.onTransaction = options.onTransaction;
-  this.onPayment = options.onPayment;
-  this.onTrustSet = options.onTrustSet;
-  this.onAccountSet = options.onAccountSet;
-  this.onOfferCreate = options.onOfferCreate;
-  this.onOfferCancel = options.onOfferCancel;
-  this.onSetRegularKey = options.onSetRegularKey;
-  this.onError = options.onError || function(error) {
+
+  onError() {
     console.log('RippleAccountMonitor::Error', error);
-  };
-}
+    console.log('RippleAccountMonitor::Error', error.message);
+    console.log('RippleAccountMonitor::Error', error.stack);
+  }
 
-RippleAccountMonitor.prototype = {
-
-  start: function() {
-    var _this = this;
-    if (_this.lastHash) {
-      _this._processNextTransaction();
+  start() {
+    this.stopped = false
+    if (this.lastHash) {
+      this._processNextTransaction();
     } else {
+      console.error('no transaction specified')
+      process.exit(1)
       // get the most recent hash, then:
       // _this._processNextTransaction();
     }
-  },
+  }
 
-  stop: function() {
-  },
-  
-  _loop: function(timeout) {
-    var _this = this;
+  stop() {
+    this.stopped = true
+  }
+
+  _loop(timeout) {
+    if (this.stopped) {
+      return
+    }
+
+    let process = this._processNextTransaction.bind(this)
     if (timeout) {
-      setTimeout(_this._processNextTransaction.bind(_this), timeout);
+      setTimeout(process, timeout);
     } else {
-      setImmediate(_this._processNextTransaction.bind(_this));
+      setImmediate(process);
     }   
-  },
+  }
 
-  _getNextTransaction: function(callback) {
-    var _this = this;
-    _this.rippleRestClient.getNotification(_this.lastHash, function(error, notification) {
-      if (error) {
-        _this.onError(error);
-        return callback(error);
+  _getNotificationAsync(hash) {
+    if (!hash) {
+      throw new Error('no hash')
+    }
+    if (!this.__getNotificationAsync) {
+      this.__getNotificationAsync = promisify(this.rippleRestClient.getNotification.bind(this.rippleRestClient))
+    }
+
+    return this.__getNotificationAsync(hash)
+  }
+
+  _getTransactionAsync(hash) {
+    if (!hash) {
+      throw new Error('no hash')
+    }
+    if (!this.__getTransactionAsync) {
+      this.__getTransactionAsync = promisify(this.rippleRestClient.getTransaction.bind(this.rippleRestClient))
+    }
+
+    return this.__getTransactionAsync(hash)
+  }
+
+  async _getNextTransaction() {
+    const notification = await this._getNotificationAsync(this.lastHash)
+    if (!notification) {
+      throw new Error('no notification')
+    }
+
+    if (notification.next_notification_hash) {
+      const response = await this._getTransactionAsync(notification.next_notification_hash)
+
+      if (!response.transaction) {
+        throw new Error('no transaction')
       }
-      if (!notification) {
-        return callback();
-      }
-      _this.rippleRestClient.getNotification(_this.lastHash, function(error, notification) {
-        if (error) {
-          _this.onError(error);
-          return callback(error);
-        }
-        if (!notification) {
-          return callback();
-        }
-        if (notification.next_notification_hash) {
-          return _this.rippleRestClient.getTransaction(notification.next_notification_hash, function(error, response) {
-            if (error) {
-              _this.onError(error);
-              return callback(error);
-            }
-            if (!response) {
-              callback();
-            } else {
-              callback(null, response.transaction);
-            }
-          });
-        } else {
-          return callback();
-        }
-      });
-    });
-  },
-  
-  _processNextTransaction: function() {
-    var _this = this;
-    _this._getNextTransaction(function(error, transaction) {
-      if (error) {
-        _this.onError(error);
-        return _this._loop(_this.timeout);
-      } 
-      if (!transaction) {
-        return _this._loop(_this.timeout);
-      }
-      var hook = _this.onTransaction; 
-      switch(transaction.TransactionType) {
+
+      return response.transaction
+    }
+
+    else {
+      // this return is "caught" on line 142
+      return
+    }
+  }
+
+  async _processNextTransaction() {
+    try {
+      const transaction = await this._getNextTransaction() 
+
+      // if not transaction, loop until there is one
+      if (transaction) {
+
+        let hook
+        switch (transaction.TransactionType) {
         case 'Payment':
-          if (typeof _this.onPayment === 'function') { hook = _this.onPayment }
+          if (typeof this.onPayment === 'function') { hook = this.onPayment }
           break;
         case 'TrustSet':
-          if (typeof _this.onTrustSet === 'function') { hook = _this.onTrustSet }
+          if (typeof this.onTrustSet === 'function') { hook = this.onTrustSet }
           break;
         case 'AccountSet':
-          if (typeof _this.onAccountSet === 'function') { hook = _this.onAccountSet }
+          if (typeof this.onAccountSet === 'function') { hook = this.onAccountSet }
           break;
         case 'OfferCreate':
-          if (typeof _this.onOfferCreate === 'function') { hook = _this.onOfferCreate }
+          if (typeof this.onOfferCreate === 'function') { hook = this.onOfferCreate }
           break;
         case 'OfferCancel':
-          if (typeof _this.onOfferCancel === 'function') { hook = _this.onOfferCancel }
+          if (typeof this.onOfferCancel === 'function') { hook = this.onOfferCancel }
           break;
         case 'SetRegularKey':
-          if (typeof _this.onSetRegularKey === 'function') { hook = _this.onSetRegularKey }
+          if (typeof this.onSetRegularKey === 'function') { hook = this.onSetRegularKey }
           break;
         default:
+          hook = this.onTransaction
+        }
+
+        const result = hook.call(this, transaction)
+          
+        // if hook asynchronous, wait for completion
+        if (result instanceof Promise) {
+          await result
+        }
+        // else hook was not asynchronous, can continue
+
+        this.lastHash = transaction.hash
+
       }
-      hook(transaction, function() {
-        _this.lastHash = transaction.hash;
-        _this._loop();
-      });
-    }.bind(_this));
+    }
+    catch (error) {
+      this.onError(error)
+    }
+
+    this._loop(this.timeout)
   }
 }
 
-module.exports = RippleAccountMonitor;
+// helper function, see bluebird.promisify
+// does not bind context, do this yourself
+function promisify(boundMethod) {
+  return function(param) {
+    return new Promise((resolve, reject) => {
+      boundMethod(param, (error, result) => {
+        error? reject(error) : resolve(result)
+      })
+    })
+  }
+}
 

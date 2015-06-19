@@ -2,13 +2,17 @@
   "name": "ripple-account-monitor",
   "version": "2.2.0",
   "description": "process ripple account activity serially",
-  "main": "src/ripple_account_monitor.js",
+  "main": "build/ripple_account_monitor.js",
   "scripts": {
-    "test": "node test/monitor_forever.js"
+    "test": "node test/monitor_forever.js",
+    "build": "babel src --out-dir build"
   },
   "author": "Steven Zeiler",
   "license": "ISC",
   "dependencies": {
-    "ripple-rest-client": "^1.13.0"
+    "ripple-rest-client": "^1.16.1"
+  },
+  "devDependencies": {
+    "babel": "^5.5.8"
   }
 }

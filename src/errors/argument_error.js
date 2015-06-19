@@ -1,9 +1,6 @@
-function ArgumentError(message) {
-  this.name = 'ArgumentError';
-  this.message = message || '';
+export default class ArgumentError extends Error {
+  get name() {
+    return 'ArgumentError'
+  }
 }
-
-ArgumentError.prototype = Error.prototype;
-
-module.exports = ArgumentError;
 
