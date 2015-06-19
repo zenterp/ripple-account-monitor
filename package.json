@@ -9,6 +9,6 @@
   "author": "Steven Zeiler",
   "license": "ISC",
   "dependencies": {
-    "ripple-rest-client": "^1.13.0"
+    "ripple-rest-client": "^1.16.1"
   }
 }
