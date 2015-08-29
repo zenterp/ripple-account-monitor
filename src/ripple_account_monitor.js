@@ -1,6 +1,8 @@
 const RippleRestClient = require('ripple-rest-client');
 const ArgumentError = require('./errors/argument_error.js');
 
+const TIMEOUT = 3000
+
 function RippleAccountMonitor(options) {
   if (!options) {
     throw new ArgumentError('options must be an object');
@@ -126,10 +128,21 @@ RippleAccountMonitor.prototype = {
           break;
         default:
       }
-      hook(transaction, function() {
-        _this.lastHash = transaction.hash;
-        _this._loop();
-      });
+      hook(transaction,
+        function() { // advance
+          process.nextTick(function() {
+            _this.lastHash = transaction.hash;
+            _this._loop();
+          })
+        },
+        function(timeout) { // retry
+          setTimeout(function() {
+            process.nextTick(function() {
+              _this._loop()
+            })
+          }, timeout || TIMEOUT)
+        }
+      )
     }.bind(_this));
   }
 }
