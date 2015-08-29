@@ -1,6 +1,6 @@
 {
   "name": "ripple-account-monitor",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "description": "process ripple account activity serially",
   "main": "src/ripple_account_monitor.js",
   "scripts": {
